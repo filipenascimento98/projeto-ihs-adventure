@@ -1,15 +1,9 @@
 #include <gb/gb.h>
 #include <stdio.h>
-#include "keyboarddata.c"
-#include "mainScreen.c"
+#include "backgrounds.c"
+#include "structs.c"
 #include "sprites.c"
-#include "cursor.c"
-#include "fontMainScreen.c"
-#include "GameCharacter.c"
-#include "GameSprites.c"
-#include "GameBullet.c"
-#include "backgroundFase1.c"
-#include "backgroundFase1Sprites.c"
+ 
 
 UINT8 i;
 UINT8 isInMainScreen = 1;

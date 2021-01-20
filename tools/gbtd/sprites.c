@@ -1,8 +1,8 @@
 /*
 
- KEYBOARDDATA.H
+ SPRITES.C
 
- Include File.
+ Tile Source File.
 
  Info:
   Form                 : All tiles as one unit.
@@ -10,7 +10,7 @@
   Compression          : None.
   Counter              : None.
   Tile size            : 8 x 8
-  Tiles                : 0 to 44
+  Tiles                : 0 to 0
 
   Palette colors       : None.
   SGB Palette          : None.
@@ -22,10 +22,11 @@
 
 */
 
-
-/* Bank of tiles. */
-#define keyboarddataBank 0
 /* Start of tile array. */
-extern unsigned char keyboarddata[];
+unsigned char sprites[] =
+{
+  0xF7,0xF7,0xF3,0xF3,0xF1,0xF1,0x00,0x00,
+  0x00,0x00,0xF1,0xF1,0xF3,0xF3,0xF7,0xF7
+};
 
-/* End of KEYBOARDDATA.H */
+/* End of SPRITES.C */
