@@ -7,6 +7,7 @@
 
 UINT8 i;
 UINT8 isInMainScreen = 1;
+UINT8 isInFase1 = 1;
 UINT8 qtdBalas = 5;
 
 Cursor cursor;
@@ -65,7 +66,7 @@ void setupBulletNave(){
     for(i = 0; i < qtdBalas; i++){
         bulletNave[i].x = 180;
         bulletNave[i].y = 150;
-        bulletNave[i].width = 8;
+        bulletNave[i].width = 4;
         bulletNave[i].height = 8;
         bulletNave[i].disponivel = 1;
         bulletNave[i].spriteId = 4 + i;
@@ -75,8 +76,8 @@ void setupBulletNave(){
 }
 
 void setupBulletBoss(){
-    bulletBoss.x = 0;
-    bulletBoss.y = 0;
+    bulletBoss.x = 180;
+    bulletBoss.y = 150;
     bulletBoss.width = 8;
     bulletBoss.height = 8;
 
@@ -110,7 +111,7 @@ void setupBoss1(){
     boss1.bullet = &bulletNave;
     boss1.x = 70;
     boss1.y = 50;
-    boss1.width = 32;
+    boss1.width = 25;
     boss1.height = 32;
     boss1.life = 10;
 
@@ -130,18 +131,48 @@ void naveShotFire(GameBullet* bullet){
            }else{
                 bullet->y += -5;
                 moveGameBullet(bullet, bullet->x, bullet->y);
+                if(checkcollisionsBoss(&boss1, bullet)){
+                    isInFase1 = 0;
+                    moveGameBoss(&boss1, 180, 180);
+                    for(i = 0; i < qtdBalas; i++){
+                        moveGameBullet(&bulletNave[i], 180, 180);
+                    }
+                    moveGameBullet(&bulletBoss, 180, 180);
+                    moveGameNave(&nave, 180, 180);
+                }  
+           }    
+    }
+}
+
+void bossShotFire(GameBullet* bullet){
+    if(!bullet->disponivel){
+           if(bullet->y >=155){
+                bullet->disponivel = 1;
+                moveGameBullet(bullet, 180, 150);
+           }else{
+                bullet->y += 5;
+                moveGameBullet(bullet, bullet->x, bullet->y);
+                if(checkcollisionsNave(&nave, bullet)){
+                    isInFase1 = 0;
+                    moveGameBoss(&boss1, 180, 180);
+                    for(i = 0; i < qtdBalas; i++){
+                        moveGameBullet(&bulletNave[i], 180, 180);
+                    }
+                    moveGameBullet(&bulletBoss, 180, 180);
+                    moveGameNave(&nave, 180, 180);
+                }  
            }    
     }
 }
 
 void inGaming(){
 
-    while(1){
+    while(isInFase1){
        if(joypad() & J_LEFT){
             if(nave.x - 2 <= 13){
                 nave.x = 13;
             }else{
-                nave.x -= 2;
+                nave.x -= 4;
             }
             moveGameNave(&nave, nave.x, nave.y);
        }
@@ -149,7 +180,7 @@ void inGaming(){
             if(nave.x + 2 >= 147){
                 nave.x = 147;
             }else{
-                nave.x += 2;
+                nave.x += 4;
             }
             moveGameNave(&nave, nave.x, nave.y);
        }
@@ -164,13 +195,23 @@ void inGaming(){
            }           
        }
 
-        
-       for(i = 0; i < qtdBalas; i++){
-           naveShotFire(&bulletNave[i]);
+       if(isInFase1){
+            for(i = 0; i < qtdBalas; i++){
+                naveShotFire(&bulletNave[i]);
+            }
+       }
+       if(isInFase1){
+            if(bulletBoss.disponivel == 1){
+                bulletBoss.disponivel = 0;
+                bulletBoss.x = boss1.x + 12;
+                bulletBoss.y = boss1.y + 26;
+            }
+            bossShotFire(&bulletBoss);
        }
 
        performantdelay(5);      
     }
+    
 }
 
 void startFase1(){
@@ -183,11 +224,12 @@ void startFase1(){
     setupNave();
     setupBoss1();
 
-    inGaming();
-
     SHOW_BKG;
     SHOW_SPRITES;
     DISPLAY_ON;
+
+    inGaming();
+
 }
 
 void screenHighscore(){
@@ -231,8 +273,9 @@ void fadein(){
 	}
 }
 
-void main(){
-    //set sprite do cursor
+
+void menu(){
+//set sprite do cursor
     set_sprite_data(0, 1, sprites);
     set_sprite_tile(0, 0);
 
@@ -244,10 +287,11 @@ void main(){
 
     set_bkg_data(0, 45, fontMainScreen);
     set_bkg_tiles(0, 0, 20, 18, bgmainscreen);
-
     SHOW_BKG;
     SHOW_SPRITES;
     DISPLAY_ON;
+
+    isInMainScreen = 1;
 
     while(isInMainScreen){
         switch (joypad())
@@ -271,6 +315,7 @@ void main(){
         case J_START:
             if(cursor.y == 96){//Inicia o jogo
                 isInMainScreen = 0;
+                isInFase1 = 1;
                 startFase1();
             }else if(cursor.y == 112){//Vai para a tela de Highscore
                 
@@ -278,4 +323,12 @@ void main(){
         }
         performantdelay(2);
     }
+}
+
+void main(){
+
+    while(1){
+        menu();
+    }
+   
 }
