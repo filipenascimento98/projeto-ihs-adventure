@@ -10,8 +10,8 @@ UINT8 isInMainScreen = 1;
 UINT8 qtdBalas = 5;
 
 Cursor cursor;
-GameCharacter nave;
-GameCharacter boss1;
+GameCharacterNave nave;
+GameCharacterBoss boss1;
 GameBullet bulletNave[5];
 GameBullet bulletBoss;
 UBYTE spriteSize = 8;
@@ -23,11 +23,34 @@ void performantdelay(UINT8 numloops){
     }     
 }
 
-UBYTE checkcollisions(GameCharacter* one, GameBullet* two){
+UBYTE checkcollisionsNave(GameCharacterNave* one, GameBullet* two){
     return (one->x >= two->x && one->x <= two->x + two->width) && (one->y >= two->y && one->y <= two->y + two->height) || (two->x >= one->x && two->x <= one->x + one->width) && (two->y >= one->y && two->y <= one->y + one->height);
 }
 
-void moveGameCharacter(GameCharacter* character, UINT8 x, UINT8 y){
+UBYTE checkcollisionsBoss(GameCharacterBoss* one, GameBullet* two){
+    return (one->x >= two->x && one->x <= two->x + two->width) && (one->y >= two->y && one->y <= two->y + two->height) || (two->x >= one->x && two->x <= one->x + one->width) && (two->y >= one->y && two->y <= one->y + one->height);
+}
+
+void moveGameBoss(GameCharacterBoss* character, UINT8 x, UINT8 y){
+    move_sprite(character->spritids[0], x, y);
+    move_sprite(character->spritids[1], x + spriteSize, y);
+    move_sprite(character->spritids[2], x + (spriteSize * 2), y);
+    move_sprite(character->spritids[3], x + (spriteSize * 3), y);
+    move_sprite(character->spritids[4], x, y + spriteSize);
+    move_sprite(character->spritids[5], x + spriteSize, y + spriteSize);
+    move_sprite(character->spritids[6], x + (spriteSize * 2), y + spriteSize);
+    move_sprite(character->spritids[7], x + (spriteSize * 3), y + spriteSize);
+    move_sprite(character->spritids[8], x, y + (spriteSize * 2));
+    move_sprite(character->spritids[9], x + spriteSize, y + (spriteSize * 2));
+    move_sprite(character->spritids[10], x + (spriteSize * 2), y + (spriteSize * 2));
+    move_sprite(character->spritids[11], x + (spriteSize * 3), y + (spriteSize * 2));
+    move_sprite(character->spritids[12], x, y + (spriteSize * 3));
+    move_sprite(character->spritids[13], x + spriteSize, y + (spriteSize * 3));
+    move_sprite(character->spritids[14], x + (spriteSize * 2), y + (spriteSize * 3));
+    move_sprite(character->spritids[15], x + (spriteSize * 3), y + (spriteSize * 3));
+}
+
+void moveGameNave(GameCharacterNave* character, UINT8 x, UINT8 y){
     move_sprite(character->spritids[0], x, y);
     move_sprite(character->spritids[1], x + spriteSize, y);
     move_sprite(character->spritids[2], x, y + spriteSize);
@@ -45,8 +68,8 @@ void setupBulletNave(){
         bulletNave[i].width = 8;
         bulletNave[i].height = 8;
         bulletNave[i].disponivel = 1;
-        bulletNave[i].spriteId = 8 + i;
-        set_sprite_tile(bulletNave[i].spriteId, 8);
+        bulletNave[i].spriteId = 4 + i;
+        set_sprite_tile(bulletNave[i].spriteId, 4);
         moveGameBullet(&bulletNave[i], 180, 150);
     }
 }
@@ -57,8 +80,8 @@ void setupBulletBoss(){
     bulletBoss.width = 8;
     bulletBoss.height = 8;
 
-    set_sprite_tile(13, 9);
-    bulletBoss.spriteId = 9;
+    set_sprite_tile(25, 21);
+    bulletBoss.spriteId = 25;
 }
 
 void setupNave(){
@@ -79,27 +102,24 @@ void setupNave(){
     set_sprite_tile(3, 3);
     nave.spritids[3] = 3;
 
-    moveGameCharacter(&nave, nave.x, nave.y);
+    moveGameNave(&nave, nave.x, nave.y);
 }
 
 void setupBoss1(){
     setupBulletBoss();
     boss1.bullet = &bulletNave;
-    boss1.x = 30;
-    boss1.y = 16;
-    boss1.width = 16;
-    boss1.height = 16;
+    boss1.x = 70;
+    boss1.y = 50;
+    boss1.width = 32;
+    boss1.height = 32;
+    boss1.life = 10;
 
-    set_sprite_tile(4, 4);
-    boss1.spritids[0] = 4;
-    set_sprite_tile(5, 5);
-    boss1.spritids[1] = 5;
-    set_sprite_tile(6, 6);
-    boss1.spritids[2] = 6;
-    set_sprite_tile(7, 7);
-    boss1.spritids[3] = 7;
+    for(i = 0; i < 16; i++){
+        set_sprite_tile(9 + i, 5 + i);
+        boss1.spritids[i] = 9 + i;
+    }
 
-    moveGameCharacter(&boss1, boss1.x, boss1.y);
+    moveGameBoss(&boss1, boss1.x, boss1.y);
 }
 
 void naveShotFire(GameBullet* bullet){
@@ -118,18 +138,26 @@ void inGaming(){
 
     while(1){
        if(joypad() & J_LEFT){
-           nave.x -= 2;
-           moveGameCharacter(&nave, nave.x, nave.y);
+            if(nave.x - 2 <= 13){
+                nave.x = 13;
+            }else{
+                nave.x -= 2;
+            }
+            moveGameNave(&nave, nave.x, nave.y);
        }
        if(joypad() & J_RIGHT){
-           nave.x += 2;
-           moveGameCharacter(&nave, nave.x, nave.y);
+            if(nave.x + 2 >= 147){
+                nave.x = 147;
+            }else{
+                nave.x += 2;
+            }
+            moveGameNave(&nave, nave.x, nave.y);
        }
        if(joypad() & J_UP){
            for(i = 0; i < qtdBalas; i++){
                if(bulletNave[i].disponivel){
                     bulletNave[i].disponivel = 0;
-                    bulletNave[i].x = nave.x + 3;
+                    bulletNave[i].x = nave.x + 4;
                     bulletNave[i].y = nave.y - 3;
                     break;
                }
@@ -141,23 +169,16 @@ void inGaming(){
            naveShotFire(&bulletNave[i]);
        }
 
-       boss1.y += 5;
-       
-       if(boss1.y >= 144){
-           boss1.y=0;
-           boss1.x = nave.x;
-       }
-
-       moveGameCharacter(&boss1, boss1.x, boss1.y);
-
        performantdelay(5);      
     }
 }
 
 void startFase1(){
-    set_sprite_data(0, 10, GameSprites);
-    set_bkg_data(45, 3, backgroundFase1Sprit);
-    set_bkg_tiles(0, 0, 20, 18, backgroundFase1);
+    set_sprite_data(0, 5, naveSprite);//Carregando sprites da nave
+    set_sprite_data(5, 17, boss1Sprite);//Carregando sprites do boss
+    set_bkg_data(45, 3, backgroundFase1Sprite);//Carregando background da fase 1
+
+    set_bkg_tiles(0, 0, 20, 18, fase1Bkg);
 
     setupNave();
     setupBoss1();

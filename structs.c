@@ -25,4 +25,14 @@ typedef struct{
 	UINT8 y;
 	UINT8 width;
 	UINT8 height;
-} GameCharacter;
+} GameCharacterNave;
+
+typedef struct{
+	UBYTE spritids[16]; // all characters use 4 sprites
+	GameBullet* bullet;
+	UINT8 x;
+	UINT8 y;
+	UINT8 width;
+	UINT8 height;
+	UINT8 life;
+} GameCharacterBoss;
