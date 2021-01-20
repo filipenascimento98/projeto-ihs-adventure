@@ -66,7 +66,7 @@ void setupBulletNave(){
     for(i = 0; i < qtdBalas; i++){
         bulletNave[i].x = 180;
         bulletNave[i].y = 150;
-        bulletNave[i].width = 4;
+        bulletNave[i].width = 2;
         bulletNave[i].height = 8;
         bulletNave[i].disponivel = 1;
         bulletNave[i].spriteId = 4 + i;
@@ -111,7 +111,7 @@ void setupBoss1(){
     boss1.bullet = &bulletNave;
     boss1.x = 70;
     boss1.y = 50;
-    boss1.width = 25;
+    boss1.width = 32;
     boss1.height = 32;
     boss1.life = 10;
 
@@ -188,7 +188,7 @@ void inGaming(){
            for(i = 0; i < qtdBalas; i++){
                if(bulletNave[i].disponivel){
                     bulletNave[i].disponivel = 0;
-                    bulletNave[i].x = nave.x + 4;
+                    bulletNave[i].x = nave.x + 7;
                     bulletNave[i].y = nave.y - 3;
                     break;
                }
