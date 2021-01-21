@@ -4,6 +4,10 @@
 #include "structs.c"
 #include "sprites.c"
  
+unsigned char windowMap[7] = 
+{
+    0x02,0x0F,0x13,0x13,0x00,0x20,0x1F//Frase inicial BOSS 10
+};
 
 UINT8 i;
 UINT8 isInMainScreen = 1;
@@ -33,6 +37,20 @@ UBYTE checkcollisionsNave(GameCharacterNave* one, GameBullet* two){
 
 UBYTE checkcollisionsBoss(GameCharacterBoss* one, GameBullet* two){
     return (one->x >= two->x && one->x <= two->x + two->width) && (one->y >= two->y && one->y <= two->y + two->height) || (two->x >= one->x && two->x <= one->x + one->width) && (two->y >= one->y && two->y <= one->y + one->height);
+}
+
+void resetWindowMap(){
+    windowMap[0] = 0x02;
+    windowMap[1] = 0x0F;
+    windowMap[2] = 0x13;
+    windowMap[3] = 0x13;
+    windowMap[4] = 0x00;
+    windowMap[5] = 0x20;
+    windowMap[6] = 0x1F;
+}
+void updateHUD(){
+    set_win_tiles(0, 0, 7, 1, windowMap);
+    move_win(8, 137);
 }
 
 void moveGameBoss(GameCharacterBoss* character, UINT8 x, UINT8 y){
@@ -117,7 +135,7 @@ void setupNave(){
     setupBulletNave();
     nave.bullet = &bulletNave;
     nave.x = 80;
-    nave.y = 144;
+    nave.y = 138;
     nave.width = 16;
     nave.height = 16;
 
@@ -161,6 +179,9 @@ void naveShotFire(GameBullet* bullet){
                 moveGameBullet(bullet, bullet->x, bullet->y);
                 if(checkcollisionsBoss(&boss1, bullet)){
                     boss1.life -= 1;
+                    windowMap[5] = 0x1F;
+                    windowMap[6] = 31 + boss1.life;
+                    updateHUD();
                     bullet->disponivel = 1;
                     moveGameBullet(bullet, 180, 180);
                     if(boss1.life == 0){
@@ -172,6 +193,8 @@ void naveShotFire(GameBullet* bullet){
                         }
                         moveGameBullet(&bulletBoss, 180, 180);
                         moveGameNave(&nave, 180, 180);
+                        move_win(7, 180);
+                        resetWindowMap();
                     }
                 }  
            }    
@@ -180,7 +203,7 @@ void naveShotFire(GameBullet* bullet){
 
 void bossShotFire(GameBullet* bullet){
     if(!bullet->disponivel){
-           if(bullet->y >=155){
+           if(bullet->y >= 142){
                 bullet->disponivel = 1;
                 moveGameBullet(bullet, 180, 150);
            }else{
@@ -195,6 +218,8 @@ void bossShotFire(GameBullet* bullet){
                     }
                     moveGameBullet(&bulletBoss, 180, 180);
                     moveGameNave(&nave, 180, 180);
+                    move_win(7, 180);
+                    resetWindowMap();
                 }  
            }    
     }
@@ -256,10 +281,13 @@ void startFase1(){
 
     set_bkg_tiles(0, 0, 20, 18, fase1Bkg);
 
+    updateHUD();
+
     setupNave();
     setupBoss1();
 
     SHOW_BKG;
+    SHOW_WIN;
     SHOW_SPRITES;
     DISPLAY_ON;
 
