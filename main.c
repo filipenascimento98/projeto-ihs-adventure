@@ -9,6 +9,8 @@ UINT8 i;
 UINT8 isInMainScreen = 1;
 UINT8 isInFase1 = 1;
 UINT8 qtdBalas = 5;
+UINT8 dirXBoss = 1;
+UINT8 dirYBoss = 2;
 
 Cursor cursor;
 GameCharacterNave nave;
@@ -25,7 +27,8 @@ void performantdelay(UINT8 numloops){
 }
 
 UBYTE checkcollisionsNave(GameCharacterNave* one, GameBullet* two){
-    return (one->x >= two->x && one->x <= two->x + two->width) && (one->y >= two->y && one->y <= two->y + two->height) || (two->x >= one->x && two->x <= one->x + one->width) && (two->y >= one->y && two->y <= one->y + one->height);
+    return (one->x >= two->x && one->x <= two->x + two->width) && (one->y >= two->y && one->y <= two->y + two->height) || (two->x >= one->x && two->x <= one->x + one->width) && (two->y >= one->y && two->y <= one->y + one->height) ||
+            (one->x >= two->x && one->x <= two->x + two->width) && (two->y >= one->y && two->y <= one->y + one->height) || (two->x >= one->x && two->x <= one->x + one->width) && (one->y >= two->y && one->y <= two->y + two->height);
 }
 
 UBYTE checkcollisionsBoss(GameCharacterBoss* one, GameBullet* two){
@@ -60,6 +63,31 @@ void moveGameNave(GameCharacterNave* character, UINT8 x, UINT8 y){
 
 void moveGameBullet(GameBullet* bullet, UINT8 x, UINT8 y){
     move_sprite(bullet->spriteId, x, y);
+}
+
+void bossMoveFase1(){
+    if(!dirXBoss){
+            if(boss1.x - 4 <= 13){
+                boss1.x = 13;
+                dirXBoss = 1;
+            }else{
+                boss1.x -= 4;
+                boss1.y += dirYBoss;
+                dirYBoss *= -1;
+            }
+            moveGameBoss(&boss1, boss1.x, boss1.y);
+       }
+       if(dirXBoss){
+            if(boss1.x + 36 >= 160){
+                dirXBoss = 128;
+                dirXBoss = 0;
+            }else{
+                boss1.x += 4;
+                boss1.y += dirYBoss;
+                dirYBoss *= -1;
+            }
+            moveGameBoss(&boss1, boss1.x, boss1.y);
+       }
 }
 
 void setupBulletNave(){
@@ -132,13 +160,19 @@ void naveShotFire(GameBullet* bullet){
                 bullet->y += -5;
                 moveGameBullet(bullet, bullet->x, bullet->y);
                 if(checkcollisionsBoss(&boss1, bullet)){
-                    isInFase1 = 0;
-                    moveGameBoss(&boss1, 180, 180);
-                    for(i = 0; i < qtdBalas; i++){
-                        moveGameBullet(&bulletNave[i], 180, 180);
+                    boss1.life -= 1;
+                    bullet->disponivel = 1;
+                    moveGameBullet(bullet, 180, 180);
+                    if(boss1.life == 0){
+                        performantdelay(5);
+                        isInFase1 = 0;
+                        moveGameBoss(&boss1, 180, 180);
+                        for(i = 0; i < qtdBalas; i++){
+                            moveGameBullet(&bulletNave[i], 180, 180);
+                        }
+                        moveGameBullet(&bulletBoss, 180, 180);
+                        moveGameNave(&nave, 180, 180);
                     }
-                    moveGameBullet(&bulletBoss, 180, 180);
-                    moveGameNave(&nave, 180, 180);
                 }  
            }    
     }
@@ -153,6 +187,7 @@ void bossShotFire(GameBullet* bullet){
                 bullet->y += 5;
                 moveGameBullet(bullet, bullet->x, bullet->y);
                 if(checkcollisionsNave(&nave, bullet)){
+                    performantdelay(5);
                     isInFase1 = 0;
                     moveGameBoss(&boss1, 180, 180);
                     for(i = 0; i < qtdBalas; i++){
@@ -169,7 +204,7 @@ void inGaming(){
 
     while(isInFase1){
        if(joypad() & J_LEFT){
-            if(nave.x - 2 <= 13){
+            if(nave.x - 4 <= 13){
                 nave.x = 13;
             }else{
                 nave.x -= 4;
@@ -177,7 +212,7 @@ void inGaming(){
             moveGameNave(&nave, nave.x, nave.y);
        }
        if(joypad() & J_RIGHT){
-            if(nave.x + 2 >= 147){
+            if(nave.x + 4 >= 147){
                 nave.x = 147;
             }else{
                 nave.x += 4;
@@ -194,7 +229,7 @@ void inGaming(){
                }
            }           
        }
-
+       bossMoveFase1();
        if(isInFase1){
             for(i = 0; i < qtdBalas; i++){
                 naveShotFire(&bulletNave[i]);
