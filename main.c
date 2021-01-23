@@ -246,6 +246,7 @@ void bossShotFire(GameBullet* bullet){
 void inGaming(){
 
     while(isInFase1){
+        scroll_bkg(1,1);
        if(joypad() & J_LEFT){
             if(nave.x - 4 <= 13){
                 nave.x = 13;
@@ -294,12 +295,17 @@ void inGaming(){
 }
 
 void startFase1(){
+    UINT8 j = 0;
     set_sprite_data(0, 5, naveSprite);//Carregando sprites da nave
     set_sprite_data(5, 17, boss1Sprite);//Carregando sprites do boss
     set_sprite_data(22, 1, heartSprite);
-    set_bkg_data(45, 3, backgroundFase1Sprite);//Carregando background da fase 1
-
-    set_bkg_tiles(0, 0, 20, 18, fase1Bkg);
+    //set_bkg_data(45, 3, backgroundFase1Sprite);//Carregando background da fase 1
+    set_bkg_data(45, 0x2D, bkg_data);
+    
+    for(i = 0; i < 32; i+=8)
+        for(j = 0; j < 32; j+=8)
+            set_bkg_tiles(i, j, 8, 8, bkg_tiles);
+    //set_bkg_tiles(0, 0, 20, 18, fase1Bkg);
 
     //setupHUD(10);//Coloca na tela 10 corações
 
@@ -311,6 +317,7 @@ void startFase1(){
     DISPLAY_ON;
 
     inGaming();
+    move_bkg(0, 0);//Como o background estará se movendo, ele retorna a posição original
 }
 
 void screenHighscore(){
