@@ -48,9 +48,11 @@ void resetWindowMap(){
     windowMap[5] = 0x20;
     windowMap[6] = 0x1F;
 }
-void updateHUD(){
-    set_win_tiles(0, 0, 7, 1, windowMap);
-    move_win(8, 137);
+void setupHUD(UINT8 life){
+    for(i = 0; i < life; i++){
+        set_sprite_tile(26 + i, 22);
+        move_sprite(26 + i, 20 + (8*i), 20);
+    }
 }
 
 void moveGameBoss(GameCharacterBoss* character, UINT8 x, UINT8 y){
@@ -135,7 +137,7 @@ void setupNave(){
     setupBulletNave();
     nave.bullet = &bulletNave;
     nave.x = 80;
-    nave.y = 138;
+    nave.y = 144;
     nave.width = 16;
     nave.height = 16;
 
@@ -169,6 +171,22 @@ void setupBoss1(){
     moveGameBoss(&boss1, boss1.x, boss1.y);
 }
 
+void playShotSoundNave(){
+    NR10_REG = 0x1E;
+    NR11_REG = 0x10;
+    NR12_REG = 0xF3;
+    NR13_REG = 0x00;
+    NR14_REG = 0x87;
+}
+
+void playLobbySound(){
+    NR10_REG = 0x00;
+    NR11_REG = 0x81;
+    NR12_REG = 0x43;
+    NR13_REG = 0x73;
+    NR14_REG = 0x86;
+}
+
 void naveShotFire(GameBullet* bullet){
     if(!bullet->disponivel){
            if(bullet->y <= 5){
@@ -181,7 +199,7 @@ void naveShotFire(GameBullet* bullet){
                     boss1.life -= 1;
                     windowMap[5] = 0x1F;
                     windowMap[6] = 31 + boss1.life;
-                    updateHUD();
+                    //updateHUD();
                     bullet->disponivel = 1;
                     moveGameBullet(bullet, 180, 180);
                     if(boss1.life == 0){
@@ -203,7 +221,7 @@ void naveShotFire(GameBullet* bullet){
 
 void bossShotFire(GameBullet* bullet){
     if(!bullet->disponivel){
-           if(bullet->y >= 142){
+           if(bullet->y >= 155){
                 bullet->disponivel = 1;
                 moveGameBullet(bullet, 180, 150);
            }else{
@@ -247,6 +265,7 @@ void inGaming(){
        if(joypad() & J_UP){
            for(i = 0; i < qtdBalas; i++){
                if(bulletNave[i].disponivel){
+                    playShotSoundNave();
                     bulletNave[i].disponivel = 0;
                     bulletNave[i].x = nave.x + 7;
                     bulletNave[i].y = nave.y - 3;
@@ -277,22 +296,21 @@ void inGaming(){
 void startFase1(){
     set_sprite_data(0, 5, naveSprite);//Carregando sprites da nave
     set_sprite_data(5, 17, boss1Sprite);//Carregando sprites do boss
+    set_sprite_data(22, 1, heartSprite);
     set_bkg_data(45, 3, backgroundFase1Sprite);//Carregando background da fase 1
 
     set_bkg_tiles(0, 0, 20, 18, fase1Bkg);
 
-    updateHUD();
+    //setupHUD(10);//Coloca na tela 10 corações
 
-    setupNave();
-    setupBoss1();
+    setupNave();//Carrega as características da nave
+    setupBoss1();//Carrega as características do boss1
 
     SHOW_BKG;
-    SHOW_WIN;
     SHOW_SPRITES;
     DISPLAY_ON;
 
     inGaming();
-
 }
 
 void screenHighscore(){
@@ -363,6 +381,7 @@ void menu(){
             if(cursor.y - 16 < 96){
                 cursor.y = 96;
             }else{
+                playLobbySound();
                 cursor.y -= 16;
             }
             move_sprite(0, cursor.x, cursor.y);
@@ -371,6 +390,7 @@ void menu(){
             if(cursor.y + 16 > 112){
                 cursor.y = 112;
             }else{
+                playLobbySound();
                 cursor.y += 16;
             }
             move_sprite(0, cursor.x, cursor.y);
@@ -389,6 +409,9 @@ void menu(){
 }
 
 void main(){
+    NR52_REG = 0x80;
+    NR51_REG = 0x11;
+    NR50_REG = 0x77;
 
     while(1){
         menu();
