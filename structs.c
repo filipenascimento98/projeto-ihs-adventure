@@ -36,3 +36,11 @@ typedef struct{
 	UINT8 height;
 	UINT8 life;
 } GameCharacterBoss;
+
+typedef struct{
+	UBYTE spritids[10]; // all characters use 10 sprites
+	UINT8 x;
+	UINT8 y;
+	UINT8 life;
+	UINT8 tipoBoss;
+} GameLifeBoss;

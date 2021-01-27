@@ -37,13 +37,11 @@ Cursor cursorKeyboard;
 
 GameCharacterNave nave;
 GameCharacterBoss boss[3];
-/* 
-GameCharacterBoss boss1;
-GameCharacterBoss boss2;
-GameCharacterBoss boss3; 
-*/
+
 GameBullet bulletNave[5];
 GameBullet bulletBoss;
+
+GameLifeBoss lifeBoss;
 
 void performantdelay(UINT8 numloops){
     UINT8 ii;
@@ -230,27 +228,92 @@ void moveGameBullet(GameBullet* bullet, UINT8 x, UINT8 y){
 
 void bossMoveFase1(){
     if(!dirXBoss){
-            if(boss[0].x - 4 <= 13){
-                boss[0].x = 13;
+            if(boss[currentBoss].x - 4 <= 13){
+                boss[currentBoss].x = 13;
                 dirXBoss = 1;
             }else{
-                boss[0].x -= 4;
-                boss[0].y += dirYBoss;
+                boss[currentBoss].x -= 4;
+                boss[currentBoss].y += dirYBoss;
                 dirYBoss *= -1;
             }
-            moveGameBoss(&boss[0], boss[0].x, boss[0].y);
+            moveGameBoss(&boss[currentBoss], boss[currentBoss].x, boss[currentBoss].y);
        }
        if(dirXBoss){
-            if(boss[0].x + 36 >= 160){
+            if(boss[currentBoss].x + 36 >= 160){
                 dirXBoss = 128;
                 dirXBoss = 0;
             }else{
-                boss[0].x += 4;
-                boss[0].y += dirYBoss;
+                boss[currentBoss].x += 4;
+                boss[currentBoss].y += dirYBoss;
                 dirYBoss *= -1;
             }
-            moveGameBoss(&boss[0], boss[0].x, boss[0].y);
+            moveGameBoss(&boss[currentBoss], boss[currentBoss].x, boss[currentBoss].y);
        }
+}
+
+
+void setupLifeBoss(){
+    switch (currentBoss)
+    {
+        case 0:
+            
+            lifeBoss.x = 20;
+            lifeBoss.y = 150;
+            lifeBoss.life = 10 ;
+            lifeBoss.tipoBoss = currentBoss;
+            set_sprite_tile(28 , 24);
+            lifeBoss.spritids[0] = 28;
+            for(i = 0; i < 8; i++){
+                set_sprite_tile(29 + i, 25);
+                lifeBoss.spritids[i+1] = 29 + i;
+            }
+            set_sprite_tile(37, 26);
+            lifeBoss.spritids[9] = 37;
+            
+            for(i = 0; i < 10; i++){
+                move_sprite(lifeBoss.spritids[i], lifeBoss.x + (spriteSize * i), lifeBoss.y);
+            }
+            
+            break;
+        case 1:
+           lifeBoss.x = 20;
+            lifeBoss.y = 20;
+            lifeBoss.life = 10 ;
+            lifeBoss.tipoBoss = currentBoss;
+            set_sprite_tile(28 , 24);
+            lifeBoss.spritids[0] = 28;
+            for(i = 0; i < 8; i++){
+                set_sprite_tile(29 + i, 25);
+                lifeBoss.spritids[i+1] = 29 + i;
+            }
+            set_sprite_tile(37, 26);
+            lifeBoss.spritids[9] = 37;
+            
+            for(i = 0; i < 10; i++){
+                move_sprite(lifeBoss.spritids[i], lifeBoss.x + (spriteSize * i), lifeBoss.y);
+            }
+            break;
+        case 2:
+            lifeBoss.x = 20;
+            lifeBoss.y = 20;
+            lifeBoss.life = 10 ;
+            lifeBoss.tipoBoss = currentBoss;
+            set_sprite_tile(28 , 24);
+            lifeBoss.spritids[0] = 28;
+            for(i = 0; i < 8; i++){
+                set_sprite_tile(29 + i, 25);
+                lifeBoss.spritids[i+1] = 29 + i;
+            }
+            set_sprite_tile(37, 26);
+            lifeBoss.spritids[9] = 37;
+            
+            for(i = 0; i < 10; i++){
+                move_sprite(lifeBoss.spritids[i], lifeBoss.x + (spriteSize * i), lifeBoss.y);
+            }
+            break;
+        default:
+            break;
+    }
 }
 
 void setupBulletNave(){
@@ -369,7 +432,6 @@ void naveShotFire(GameBullet* bullet){
                         }
                         moveGameBullet(&bulletBoss, 180, 180);
                         moveGameNave(&nave, 180, 180);
-                        move_win(7, 180);
                         //saveGame();
                         nextFase();
                     }
@@ -469,7 +531,7 @@ void nextFase(){
         break;
     
     case 3:
-        startFase3();
+        menu();
         break;
 
     case 4:
@@ -486,6 +548,7 @@ void startFase1(){
     j = 0;
     set_sprite_data(0, 5, naveSprite);//Carregando sprites da nave
     set_sprite_data(5, 17, boss1Sprite);//Carregando sprites do boss
+    //set_sprite_data(24,9,lifeBossSprite);
     //set_sprite_data(22, 1, heartSprite);
     //set_bkg_data(45, 3, backgroundFase1Sprite);//Carregando background da fase 1
     set_bkg_data(45, 0x2D, bkg_data);
@@ -624,6 +687,8 @@ void menu(){
     set_sprite_data(0, 1, cursorSprite);
     set_sprite_tile(0, 0);
 
+    move_bkg(0,0);
+    currentFase = 1;
     cursor.x = 32;
     cursor.y = 96;
     cursor.col = 0;

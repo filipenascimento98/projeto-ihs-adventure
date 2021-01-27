@@ -1,6 +1,6 @@
 XL
 H 9 areas 7 global symbols
-M lcc108920
+M lcc86640
 S __cpu Ref0000
 S _sys_time Ref0000
 S __io_in Ref0000
