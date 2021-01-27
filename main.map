@@ -21,59 +21,69 @@ AREA .  .ABS.
 		l__HOME	01AC
 		l__HEADER	01E1
 		s__CODE	0200
-		l__BASE	0201
-		l__DATA	0A77
-		l__CODE	1518
-		s__HOME	1718
-		s__BASE	18C4
-		s__LIT	1AC5
-		s__GSINIT	1AC5
-		l__GSINIT	3D08
-		s__GSINITTAIL	57CD
-		s__GSFINAL	57CE
+		l__BASE	021F
+		l__DATA	0E80
+		l__CODE	193E
+		s__HOME	1B3E
+		s__BASE	1CEA
+		s__LIT	1F09
+		s__GSINIT	1F09
+		l__GSINIT	54B2
+		s__GSINITTAIL	73BB
+		s__GSFINAL	73BC
 		.OAM	C000
 		s__DATA	C0A0
-		s__BSS	CB17
-		s__HEAP	CB70
-		s__BSEG	CB70
-		s__ISEG	CB70
-		s__XSEG	CB70
-		s__OVERLAY	CB70
+		s__BSS	CF20
+		s__HEAP	CF79
+		s__BSEG	CF79
+		s__ISEG	CF79
+		s__XSEG	CF79
+		s__OVERLAY	CF79
 		.STACK	E000
 		.refresh_OAM	FF80
 		l__SFR	10000
 AREA _CODE
 	RADIX HEX
 	BASE 0200
-	SIZE 1518
+	SIZE 193E
 	ATTRIB REL CON
 	GLOBALS
 		_performantdelay	0200
 		_bkg_data	0214
 		_bkg_tiles	04E4
-		_checkcollisionsNave	0524
-		_checkcollisionsBoss	06D7
-		_resetWindowMap	0848
-		_setupHUD	0873
-		_moveGameBoss	08C0
-		_moveGameNave	0AF6
-		_moveGameBullet	0B80
-		_bossMoveFase1	0B9B
-		_setupBulletNave	0CB6
-		_setupBulletBoss	0D59
-		_setupNave	0D85
-		_setupBoss1	0E25
-		_playShotSoundNave	0EC3
-		_playLobbySound	0ED8
-		_naveShotFire	0EED
-		_bossShotFire	106D
-		_inGaming	1199
-		_startFase1	1418
-		_screenHighscore	14D5
-		_fadeout	14D6
-		_fadein	152B
-		_menu	1576
-		_main	1705
+		_mincursorx	0524
+		_mincursory	0525
+		_maxcursorx	0526
+		_maxcursory	0527
+		_checkcollisionsNave	0528
+		_checkcollisionsBoss	06DB
+		_drawPlayerName	084C
+		_addToPlayerName	0866
+		_removeFromPlayerName	08BA
+		_isWithinKeyboard	08D5
+		_updatePlayerName	0982
+		_saveGame	09FE
+		_resetWindowMap	0C6E
+		_setupHUD	0C99
+		_moveGameBoss	0CE6
+		_moveGameNave	0F1C
+		_moveGameBullet	0FA6
+		_bossMoveFase1	0FC1
+		_setupBulletNave	10DC
+		_setupBulletBoss	117F
+		_setupNave	11AB
+		_setupBoss1	124B
+		_playShotSoundNave	12E9
+		_playLobbySound	12FE
+		_naveShotFire	1313
+		_bossShotFire	1493
+		_inGaming	15BF
+		_startFase1	183E
+		_screenHighscore	18FB
+		_fadeout	18FC
+		_fadein	1951
+		_menu	199C
+		_main	1B2B
 AREA _HEADER
 	RADIX HEX
 	BASE 0000
@@ -83,180 +93,191 @@ AREA _HEADER
 		_exit	01D2
 AREA _HOME
 	RADIX HEX
-	BASE 1718
+	BASE 1B3E
 	SIZE 01AC
 	ATTRIB REL CON
 	GLOBALS
-		.set_mode	1718
-		.remove_VBL	1728
-		.remove_LCD	172E
-		.remove_TIM	1734
-		.remove_SIO	173A
-		.remove_JOY	1740
-		.add_VBL	1746
-		.add_LCD	174C
-		.add_TIM	1752
-		.add_SIO	1758
-		.add_JOY	175E
-		.remove_int	1764
-		.add_int	1784
-		.wait_vbl_done	17A0
-		_wait_vbl_done	17A0
-		_display_off	17B7
-		.display_off	17B7
-		.serial_IO	17D8
-		_mode	1807
-		_get_mode	1810
-		_enable_interrupts	1815
-		_disable_interrupts	1817
-		_reset	1819
-		.reset	1819
-		_set_interrupts	181F
-		_remove_VBL	182A
-		_remove_LCD	1835
-		_remove_TIM	1840
-		_remove_SIO	184B
-		_remove_JOY	1856
-		_add_VBL	1861
-		_add_LCD	186C
-		_add_TIM	1877
-		_add_SIO	1882
-		_add_JOY	188D
-		_clock	1898
-		__printTStates	18A1
-		banked_call	18A2
-		banked_ret	18BB
+		.set_mode	1B3E
+		.remove_VBL	1B4E
+		.remove_LCD	1B54
+		.remove_TIM	1B5A
+		.remove_SIO	1B60
+		.remove_JOY	1B66
+		.add_VBL	1B6C
+		.add_LCD	1B72
+		.add_TIM	1B78
+		.add_SIO	1B7E
+		.add_JOY	1B84
+		.remove_int	1B8A
+		.add_int	1BAA
+		.wait_vbl_done	1BC6
+		_wait_vbl_done	1BC6
+		_display_off	1BDD
+		.display_off	1BDD
+		.serial_IO	1BFE
+		_mode	1C2D
+		_get_mode	1C36
+		_enable_interrupts	1C3B
+		_disable_interrupts	1C3D
+		_reset	1C3F
+		.reset	1C3F
+		_set_interrupts	1C45
+		_remove_VBL	1C50
+		_remove_LCD	1C5B
+		_remove_TIM	1C66
+		_remove_SIO	1C71
+		_remove_JOY	1C7C
+		_add_VBL	1C87
+		_add_LCD	1C92
+		_add_TIM	1C9D
+		_add_SIO	1CA8
+		_add_JOY	1CB3
+		_clock	1CBE
+		__printTStates	1CC7
+		banked_call	1CC8
+		banked_ret	1CE1
 AREA _BASE
 	RADIX HEX
-	BASE 18C4
-	SIZE 0201
+	BASE 1CEA
+	SIZE 021F
 	ATTRIB REL CON
 	GLOBALS
-		_scroll_bkg	18C4
-		_move_win	18DA
-		.mv_sprite	18E3
-		_move_sprite	18F2
-		_set_win_data	18FF
-		_set_bkg_data	18FF
-		_set_sprite_data	194C
-		__mulschar	197B
-		__muluchar	197B
-		__mulsint	1987
-		__muluint	1987
-		.mulu16	199B
-		.mul16	199B
-		.padup	19B1
-		_waitpadup	19B1
-		.jpad	19C1
-		.wait_pad	19EE
-		_joypad	19F5
-		_waitpad	19FA
-		_move_bkg	1A04
-		.set_sprite_tile	1A0D
-		_set_sprite_tile	1A1A
-		.copy_vram	1A25
-		_get_data	1A34
-		_set_data	1A34
-		_set_bkg_tiles	1A47
-		.set_xy_wtt	1A5B
-		.set_xy_btt	1A6C
-		.set_xy_tt	1A7B
-		_set_tiles	1AAC
+		_scroll_bkg	1CEA
+		_move_win	1D00
+		.mv_sprite	1D09
+		_move_sprite	1D18
+		_set_win_data	1D25
+		_set_bkg_data	1D25
+		_set_sprite_data	1D72
+		__mulschar	1DA1
+		__muluchar	1DA1
+		__mulsint	1DAD
+		__muluint	1DAD
+		.mulu16	1DC1
+		.mul16	1DC1
+		.scroll_sprite	1DD7
+		_scroll_sprite	1DE8
+		.padup	1DF5
+		_waitpadup	1DF5
+		.jpad	1E05
+		.wait_pad	1E32
+		_joypad	1E39
+		_waitpad	1E3E
+		_move_bkg	1E48
+		.set_sprite_tile	1E51
+		_set_sprite_tile	1E5E
+		.copy_vram	1E69
+		_get_data	1E78
+		_set_data	1E78
+		_set_bkg_tiles	1E8B
+		.set_xy_wtt	1E9F
+		.set_xy_btt	1EB0
+		.set_xy_tt	1EBF
+		_set_tiles	1EF0
 AREA _LIT
 	RADIX HEX
-	BASE 1AC5
+	BASE 1F09
 	SIZE 0000
 	ATTRIB REL CON
 AREA _GSINIT
 	RADIX HEX
-	BASE 1AC5
-	SIZE 3D08
+	BASE 1F09
+	SIZE 54B2
 	ATTRIB REL CON
 	GLOBALS
-		gsinit	1AC5
+		gsinit	1F09
 AREA _GSINITTAIL
 	RADIX HEX
-	BASE 57CD
+	BASE 73BB
 	SIZE 0001
 	ATTRIB REL CON
 AREA _GSFINAL
 	RADIX HEX
-	BASE 57CE
+	BASE 73BC
 	SIZE 0000
 	ATTRIB REL CON
 AREA _DATA
 	RADIX HEX
 	BASE C0A0
-	SIZE 0A77
+	SIZE 0E80
 	ATTRIB REL CON
 	GLOBALS
 		_fase1Bkg	C0A0
 		_fontMainScreen	C208
-		_keyboarddata	C4D8
-		_bgmainscreen	C7A8
-		_sprites	C910
-		_heartSprite	C920
-		_backgroundFase1Sprite	C930
-		_naveSprite	C960
-		_boss1Sprite	C9B0
-		_windowMap	CAC0
-		_i	CAC7
-		_isInMainScreen	CAC8
-		_isInFase1	CAC9
-		_qtdBalas	CACA
-		_dirXBoss	CACB
-		_dirYBoss	CACC
-		_cursor	CACD
-		_nave	CAD1
-		_boss1	CADB
-		_bulletNave	CAF2
-		_bulletBoss	CB10
-		_spriteSize	CB16
+		_mainScreenBkg	C4D8
+		_keyboardData	C640
+		_keyboardBkg	C910
+		_screenHighscoreBkg	CA78
+		_cursorKeyboardSprite	CBE0
+		_cursorSprite	CBF0
+		_heartSprite	CC00
+		_backgroundFase1Sprite	CC10
+		_naveSprite	CC40
+		_boss1Sprite	CC90
+		_boss2Sprite	CDA0
+		_windowMap	CEB0
+		_i	CEB7
+		_isInMainScreen	CEB8
+		_isInFase1	CEB9
+		_qtdBalas	CEBA
+		_dirXBoss	CEBB
+		_dirYBoss	CEBC
+		_cursor	CEBD
+		_cursorKeyboard	CEC1
+		_keyDown	CEC5
+		_nameCharacterIndex	CEC6
+		_playerName	CEC7
+		_playerHasName	CED9
+		_nave	CEDA
+		_boss1	CEE4
+		_bulletNave	CEFB
+		_bulletBoss	CF19
+		_spriteSize	CF1F
 AREA _BSS
 	RADIX HEX
-	BASE CB17
+	BASE CF20
 	SIZE 0059
 	ATTRIB REL CON
 	GLOBALS
-		__cpu	CB17
-		.mode	CB18
-		__io_out	CB19
-		__io_in	CB1A
-		__io_status	CB1B
-		.vbl_done	CB1C
-		__current_bank	CB1D
-		_sys_time	CB1E
-		.sys_time	CB1E
-		.int_0x40	CB20
-		.int_0x48	CB30
-		.int_0x50	CB40
-		.int_0x58	CB50
-		.int_0x60	CB60
+		__cpu	CF20
+		.mode	CF21
+		__io_out	CF22
+		__io_in	CF23
+		__io_status	CF24
+		.vbl_done	CF25
+		__current_bank	CF26
+		_sys_time	CF27
+		.sys_time	CF27
+		.int_0x40	CF29
+		.int_0x48	CF39
+		.int_0x50	CF49
+		.int_0x58	CF59
+		.int_0x60	CF69
 AREA _HEAP
 	RADIX HEX
-	BASE CB70
+	BASE CF79
 	SIZE 0000
 	ATTRIB REL CON
 	GLOBALS
-		_malloc_heap_start	CB70
+		_malloc_heap_start	CF79
 AREA _OVERLAY
 	RADIX HEX
-	BASE CB70
+	BASE CF79
 	SIZE 0000
 	ATTRIB REL CON
 AREA _ISEG
 	RADIX HEX
-	BASE CB70
+	BASE CF79
 	SIZE 0000
 	ATTRIB REL CON
 AREA _BSEG
 	RADIX HEX
-	BASE CB70
+	BASE CF79
 	SIZE 0000
 	ATTRIB REL CON
 AREA _XSEG
 	RADIX HEX
-	BASE CB70
+	BASE CF79
 	SIZE 0000
 	ATTRIB REL CON
 AREA _SFR
@@ -324,7 +345,7 @@ MODULES
 	FILE c:\gbdk\lib/small/asxxxx/gb/crt0.o
 		NAME Runtime
 	FILE main.o
-		NAME lcc97080
+		NAME lcc123400
 LIBRARIES
 	LIBRARY c:\gbdk\lib/small/asxxxx/gb/gb.lib
 		MODULE sfr.o
@@ -338,6 +359,8 @@ LIBRARIES
 		MODULE set_data.o
 	LIBRARY c:\gbdk\lib/small/asxxxx/gbz80/gbz80.lib
 		MODULE mul.o
+	LIBRARY c:\gbdk\lib/small/asxxxx/gb/gb.lib
+		MODULE scroll_s.o
 	LIBRARY c:\gbdk\lib/small/asxxxx/gb/gb.lib
 		MODULE pad.o
 	LIBRARY c:\gbdk\lib/small/asxxxx/gb/gb.lib
