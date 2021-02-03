@@ -12,6 +12,7 @@ void nextFase();
  
 extern UINT8 playerName[15];
 extern UINT8 faseName[3];
+UINT8 oitava = 5;
 UINT8 i;
 UINT8 j;
 UINT8 isInMainScreen = 1;
@@ -401,13 +402,249 @@ void playShotSoundNave(){
     NR13_REG = 0x00;
     NR14_REG = 0x87;
 }
+/* void DO(){
+    switch (oitava)
+    {
+        case 5:
+            NR10_REG = 0x00;//Dó5
+            NR11_REG = 0x81;
+            NR12_REG = 0x43;
+            NR13_REG = 0x10;
+            NR14_REG = 0x82;
+            break;
+        case 6:
+            NR10_REG = 0x00;//Dó6
+            NR11_REG = 0x81;
+            NR12_REG = 0x43;
+            NR13_REG = 0x20;
+            NR14_REG = 0x84;
+            break;    
+    }
+}
 
+void RE(){
+    switch (oitava)
+    {
+        case 5:
+            NR10_REG = 0x00;//Ré5
+            NR11_REG = 0x81;
+            NR12_REG = 0x43;
+            NR13_REG = 0x51;
+            NR14_REG = 0x82;
+            break;
+        case 6:
+            NR10_REG = 0x00;//Ré6
+            NR11_REG = 0x81;
+            NR12_REG = 0x43;
+            NR13_REG = 0xA1;
+            NR14_REG = 0x84;
+            break;    
+    }
+    
+}
+
+void MI(){
+    switch (oitava)
+    {
+        case 5:
+            NR10_REG = 0x00;//Mi5
+            NR11_REG = 0x81;
+            NR12_REG = 0x43;
+            NR13_REG = 0x9A;
+            NR14_REG = 0x82;
+            break;
+        case 6:
+            NR10_REG = 0x00;//Mi6
+            NR11_REG = 0x81;
+            NR12_REG = 0x43;
+            NR13_REG = 0x33;
+            NR14_REG = 0x85;
+            break;    
+    }
+    
+}
+
+void FA(){
+    switch (oitava)
+    {
+        case 5:
+            NR10_REG = 0x00;//Fá5
+            NR11_REG = 0x81;
+            NR12_REG = 0x43;
+            NR13_REG = 0xC1;
+            NR14_REG = 0x82;
+            break;
+        case 6:
+            NR10_REG = 0x00;//Fá6
+            NR11_REG = 0x81;
+            NR12_REG = 0x43;
+            NR13_REG = 0x82;
+            NR14_REG = 0x85;
+            break;
+        NR10_REG = 0x00;//Fá#5
+        NR11_REG = 0x81;
+        NR12_REG = 0x43;
+        NR13_REG = 0xEA;
+        NR14_REG = 0x82;   
+
+        NR10_REG = 0x00;//Fá#6
+        NR11_REG = 0x81;
+        NR12_REG = 0x43;
+        NR13_REG = 0xD5;
+        NR14_REG = 0x85;   
+    }
+    
+}
+
+void SOL(){
+    switch (oitava)
+    {
+        case 5:
+            NR10_REG = 0x00;//Sol5
+            NR11_REG = 0x81;
+            NR12_REG = 0x43;
+            NR13_REG = 0x17;
+            NR14_REG = 0x83;
+            break;
+        case 6:
+            NR10_REG = 0x00;//Sol6
+            NR11_REG = 0x81;
+            NR12_REG = 0x43;
+            NR13_REG = 0x2E;
+            NR14_REG = 0x86;
+            break;    
+    }
+    
+}
+
+void LA(){
+    switch (oitava)
+    {
+        case 5:
+            NR10_REG = 0x00;//Lá5
+            NR11_REG = 0x81;
+            NR12_REG = 0x43;
+            NR13_REG = 0x78;
+            NR14_REG = 0x83;
+            break;
+        case 6:
+            NR10_REG = 0x00;//Lá6
+            NR11_REG = 0x81;
+            NR12_REG = 0x43;
+            NR13_REG = 0xF1;
+            NR14_REG = 0x86;
+            break;    
+    }
+    
+}
+
+void SI(){
+    switch (oitava)
+    {
+        case 5:
+            NR10_REG = 0x00;//Si5
+            NR11_REG = 0x81;
+            NR12_REG = 0x43;
+            NR13_REG = 0xE5;
+            NR14_REG = 0x83;
+            break;
+        case 6:
+            NR10_REG = 0x00;//Si6
+            NR11_REG = 0x81;
+            NR12_REG = 0x43;
+            NR13_REG = 0xCA;
+            NR14_REG = 0x87;
+            break;    
+    }
+} */
+    
 void playLobbySound(){
-    NR10_REG = 0x00;
+
+    for(i = 0; i < 2; i++){
+        NR10_REG = 0x00;//Sol5
+        NR11_REG = 0x81;
+        NR12_REG = 0x4B;
+        NR13_REG = 0x17;
+        NR14_REG = 0x83;
+        performantdelay(20);
+        NR10_REG = 0x00;//Muta
+        NR11_REG = 0x00;
+        NR12_REG = 0x00;
+        NR13_REG = 0x00;
+        NR14_REG = 0x80;
+        performantdelay(10);
+        NR10_REG = 0x00;//Sol5
+        NR11_REG = 0x81;
+        NR12_REG = 0x4B;
+        NR13_REG = 0x17;
+        NR14_REG = 0x83;
+        performantdelay(30);
+        NR10_REG = 0x00;//Si5
+        NR11_REG = 0x81;
+        NR12_REG = 0x4B;
+        NR13_REG = 0xE5;
+        NR14_REG = 0x83;
+        performantdelay(20);
+        NR10_REG = 0x00;//Dó6
+        NR11_REG = 0x81;
+        NR12_REG = 0x4B;
+        NR13_REG = 0x20;
+        NR14_REG = 0x84;
+        performantdelay(20);
+        NR10_REG = 0x00;//Sol5
+        NR11_REG = 0x81;
+        NR12_REG = 0x4B;
+        NR13_REG = 0x17;
+        NR14_REG = 0x83;
+        performantdelay(20);
+        NR10_REG = 0x00;//Muta
+        NR11_REG = 0x00;
+        NR12_REG = 0x00;
+        NR13_REG = 0x00;
+        NR14_REG = 0x80;
+        performantdelay(10);
+        NR10_REG = 0x00;//Sol5
+        NR11_REG = 0x81;
+        NR12_REG = 0x4B;
+        NR13_REG = 0x17;
+        NR14_REG = 0x83;
+        performantdelay(30);
+        NR10_REG = 0x00;//Fá5
+        NR11_REG = 0x81;
+        NR12_REG = 0x4B;
+        NR13_REG = 0xC1;
+        NR14_REG = 0x82;
+        performantdelay(20);
+        NR10_REG = 0x00;//Fá#5
+        NR11_REG = 0x81;
+        NR12_REG = 0x4B;
+        NR13_REG = 0xEA;
+        NR14_REG = 0x82;
+        performantdelay(20); 
+    }
+
+    NR10_REG = 0x00;//Sol5
+    NR11_REG = 0x81;
+    NR12_REG = 0x4B;
+    NR13_REG = 0x17;
+    NR14_REG = 0x83;
+    performantdelay(20);
+
+    
+    
+    NR10_REG = 0x00;//Muta
+    NR11_REG = 0x00;
+    NR12_REG = 0x00;
+    NR13_REG = 0x00;
+    NR14_REG = 0x80;
+
+    
+
+    /* NR10_REG = 0x00;
     NR11_REG = 0x81;
     NR12_REG = 0x43;
     NR13_REG = 0x73;
-    NR14_REG = 0x86;
+    NR14_REG = 0x86; */
 }
 
 void naveShotFire(GameBullet* bullet){
