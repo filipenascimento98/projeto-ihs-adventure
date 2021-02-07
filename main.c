@@ -10,8 +10,11 @@ void startFase2();
 void startFase3();
 void nextFase();
 
+extern UINT8 playerName[15];
+extern UINT8 faseName[3];
 UINT8 oitava = 5;
 UINT8 i;
+UINT8 tocou = 0;
 UINT8 j;
 UINT8 isInMainScreen = 1;
 UINT8 isInsHighscoreScreen = 0;
@@ -65,6 +68,142 @@ UBYTE checkcollisionsBoss(GameCharacterBoss *one, GameBullet *two)
     return (one->x >= two->x && one->x <= two->x + two->width) && (one->y >= two->y && one->y <= two->y + two->height) || (two->x >= one->x && two->x <= one->x + one->width) && (two->y >= one->y && two->y <= one->y + one->height);
 }
 
+//Começa save com teclado
+void drawPlayerName(){
+    set_bkg_tiles(1, 4, 15, 1, playerName);
+}
+
+void drawPlayerNameInHighScore(){
+    set_bkg_tiles(1, 4, 15, 1, playerName);
+    set_bkg_tiles(16, 4, 3, 1, faseName);
+}
+
+void addToPlayerName(Cursor* cursor){
+    UINT8 characterIndex = cursor->row * 10 + cursor->col + 1; // Indexa as sprites do keyboarBkg dando um shift pra esquerda, essa indexação serve para identificar qual letra foi selecionada
+
+    if(nameCharacterIndex == 15) return; // Tamanho máximo do nome
+
+    playerName[nameCharacterIndex] = characterIndex;
+    nameCharacterIndex++;
+    if(currentFase == 1){
+        faseName[2] = 32; //Pega a sprite do número 1, que corresponde a fase atual
+    }else{
+        faseName[2] = 33; //Pega a sprite do número 2, que corresponde a fase atual
+    }
+}
+
+void removeFromPlayerName(){
+    if(nameCharacterIndex > 0){
+        nameCharacterIndex--;
+        playerName[nameCharacterIndex] = 0;
+    }
+}
+
+UBYTE isWithinKeyboard(UINT8 x, UINT8 y){
+    if(x == 136 && y == 144 || x == 152 && y == 144){
+        return 1;
+    }
+    return x >= mincursorx && x <= maxcursorx && y >= mincursory && y <= maxcursory;
+}
+
+void updatePlayerName(Cursor* cursor){
+    // Checa se o cursor está na opção de delete
+    if(cursor->col==8 && cursor->row == 4){
+        // delete
+        removeFromPlayerName();
+        drawPlayerName();
+    }
+    else if (cursor->col==9 && cursor->row == 4){
+        // player finished
+        faseName[0] = 30; //Pega a sprite de espaço em branco
+        faseName[1] = 6; //Pega a sprite da letra F
+        playerHasName = 1;
+    }
+    else{
+        addToPlayerName(cursor);
+        drawPlayerName();
+    }
+}
+
+void resetCharacterName(){
+    for(i = 0; i != 15; i++){
+        playerName[i] = 0x00;
+    }
+    playerHasName = 0;
+}
+
+void saveGame(){
+    //Só entra no if se durante o jogo não houve nenhum save e se no arquivo não tem nenhum save salvo
+    if(!playerHasName && playerName[0] > 0x28){
+        resetCharacterName();
+        set_sprite_data(0, 1, cursorKeyboardSprite);//Armazena o cursor do teclado
+        set_sprite_tile(0, 0);
+
+        cursorKeyboard.x = 8;
+        cursorKeyboard.y = 80;
+        cursorKeyboard.col = 0;
+        cursorKeyboard.row = 0;
+        move_sprite(0, cursorKeyboard.x, cursorKeyboard.y);
+
+        set_bkg_tiles(0, 0, 20, 18, keyboardBkg);//Armazena o background de teclado
+        move_bkg(0, 0);
+        //scroll_bkg(-4, 0);
+
+        SHOW_BKG;
+        SHOW_SPRITES;
+        DISPLAY_ON;
+
+        while(!playerHasName){
+        if(keyDown){
+            waitpadup();
+            keyDown = 0;
+        }
+
+        switch (joypad())
+        {
+            case J_UP:
+                if(isWithinKeyboard(cursorKeyboard.x, cursorKeyboard.y - 16)){
+                    cursorKeyboard.y -= 16;
+                    cursor.row--;
+                    keyDown = 1;
+                    scroll_sprite(0, 0, -16);
+                }  
+                break;
+            case J_DOWN:
+                if(isWithinKeyboard(cursorKeyboard.x, cursorKeyboard.y + 16)){
+                    cursorKeyboard.y += 16;
+                    cursor.row++;
+                    keyDown = 1;
+                    scroll_sprite(0, 0, 16);
+                }
+                break;
+            case J_RIGHT:
+                if(isWithinKeyboard(cursorKeyboard.x + 16, cursorKeyboard.y)){
+                    cursorKeyboard.x += 16;
+                    cursor.col++;
+                    keyDown = 1;
+                    scroll_sprite(0, 16, 0);
+                }
+                break;    
+            case J_LEFT:
+                if(isWithinKeyboard(cursorKeyboard.x - 16, cursorKeyboard.y)){
+                cursorKeyboard.x -= 16;
+                    cursor.col--;
+                    keyDown = 1;
+                    scroll_sprite(0, -16, 0); 
+                }
+                break;
+            case J_A:
+                updatePlayerName(&cursor);
+                keyDown = 1;
+                break;    
+            }
+            performantdelay(2);
+        }
+    }
+}
+//Termina save com teclado
+
 void moveGameBoss(GameCharacterBoss *character, UINT8 x, UINT8 y)
 {
     move_sprite(character->spritids[0], x, y);
@@ -97,6 +236,8 @@ void moveGameBullet(GameBullet *bullet, UINT8 x, UINT8 y)
 {
     move_sprite(bullet->spriteId, x, y);
 }
+
+
 
 void bossMove()
 {
@@ -307,7 +448,13 @@ void playShotSoundNave()
             NR12_REG = 0x43;
             NR13_REG = 0x20;
             NR14_REG = 0x84;
-            break;    
+            break;
+
+        NR10_REG = 0x00;//Dó#5
+        NR11_REG = 0x81;
+        NR12_REG = 0x43;
+        NR13_REG = 0x2F;
+        NR14_REG = 0x82;    
     }
 }
 
@@ -327,7 +474,19 @@ void RE(){
             NR12_REG = 0x43;
             NR13_REG = 0xA1;
             NR14_REG = 0x84;
-            break;    
+            break;
+
+        NR10_REG = 0x00;//Ré#5
+        NR11_REG = 0x81;
+        NR12_REG = 0x43;
+        NR13_REG = 0x74;
+        NR14_REG = 0x82;
+
+        NR10_REG = 0x00;//Ré#6
+        NR11_REG = 0x81;
+        NR12_REG = 0x43;
+        NR13_REG = 0xE7;
+        NR14_REG = 0x84;    
     }
     
 }
@@ -402,6 +561,18 @@ void SOL(){
             NR13_REG = 0x2E;
             NR14_REG = 0x86;
             break;    
+
+        NR10_REG = 0x00;//Sol#5
+        NR11_REG = 0x81;
+        NR12_REG = 0x43;
+        NR13_REG = 0x46;
+        NR14_REG = 0x83;
+
+        NR10_REG = 0x00;//Sol#6
+        NR11_REG = 0x81;
+        NR12_REG = 0x43;
+        NR13_REG = 0x8C;
+        NR14_REG = 0x86;   
     }
     
 }
@@ -422,7 +593,19 @@ void LA(){
             NR12_REG = 0x43;
             NR13_REG = 0xF1;
             NR14_REG = 0x86;
-            break;    
+            break;
+
+        NR10_REG = 0x00;//Lá#5
+        NR11_REG = 0x81;
+        NR12_REG = 0x43;
+        NR13_REG = 0xAD;
+        NR14_REG = 0x83;
+
+        NR10_REG = 0x00;//Lá#6
+        NR11_REG = 0x81;
+        NR12_REG = 0x43;
+        NR13_REG = 0x59;
+        NR14_REG = 0x87;        
     }
     
 }
@@ -449,69 +632,155 @@ void SI(){
 
 void playLobbySound()
 {
+    NR10_REG = 0x00;
+    NR11_REG = 0x81;
+    NR12_REG = 0x43;
+    NR13_REG = 0x73;
+    NR14_REG = 0x86;
+}
 
-    for (i = 0; i < 2; i++)
-    {
-        NR10_REG = 0x00; //Sol5
-        NR11_REG = 0x81;
-        NR12_REG = 0x4B;
-        NR13_REG = 0x17;
-        NR14_REG = 0x83;
-        performantdelay(20);
-        NR10_REG = 0x00; //Muta
-        NR11_REG = 0x00;
-        NR12_REG = 0x00;
-        NR13_REG = 0x00;
-        NR14_REG = 0x80;
-        performantdelay(10);
-        NR10_REG = 0x00; //Sol5
-        NR11_REG = 0x81;
-        NR12_REG = 0x4B;
-        NR13_REG = 0x17;
-        NR14_REG = 0x83;
-        performantdelay(30);
-        NR10_REG = 0x00; //Si5
-        NR11_REG = 0x81;
-        NR12_REG = 0x4B;
-        NR13_REG = 0xE5;
-        NR14_REG = 0x83;
-        performantdelay(20);
-        NR10_REG = 0x00; //Dó6
-        NR11_REG = 0x81;
-        NR12_REG = 0x4B;
-        NR13_REG = 0x20;
-        NR14_REG = 0x84;
-        performantdelay(20);
-        NR10_REG = 0x00; //Sol5
-        NR11_REG = 0x81;
-        NR12_REG = 0x4B;
-        NR13_REG = 0x17;
-        NR14_REG = 0x83;
-        performantdelay(20);
-        NR10_REG = 0x00; //Muta
-        NR11_REG = 0x00;
-        NR12_REG = 0x00;
-        NR13_REG = 0x00;
-        NR14_REG = 0x80;
-        performantdelay(10);
-        NR10_REG = 0x00; //Sol5
-        NR11_REG = 0x81;
-        NR12_REG = 0x4B;
-        NR13_REG = 0x17;
-        NR14_REG = 0x83;
-        performantdelay(30);
-        NR10_REG = 0x00; //Fá5
-        NR11_REG = 0x81;
-        NR12_REG = 0x4B;
-        NR13_REG = 0xC1;
-        NR14_REG = 0x82;
-        performantdelay(20);
-        NR10_REG = 0x00; //Fá#5
-        NR11_REG = 0x81;
-        NR12_REG = 0x4B;
-        NR13_REG = 0xEA;
-        NR14_REG = 0x82;
-        performantdelay(20);
+void playWinGameSound()
+{
+
+    for(j = 0; j < 2; j++){
+        for (i = 0; i < 2; i++){
+            NR10_REG = 0x00; //Sol5
+            NR11_REG = 0x81;
+            NR12_REG = 0x4B;
+            NR13_REG = 0x17;
+            NR14_REG = 0x83;
+            performantdelay(20);
+            NR10_REG = 0x00; //Muta
+            NR11_REG = 0x00;
+            NR12_REG = 0x00;
+            NR13_REG = 0x00;
+            NR14_REG = 0x80;
+            performantdelay(10);
+            NR10_REG = 0x00; //Sol5
+            NR11_REG = 0x81;
+            NR12_REG = 0x4B;
+            NR13_REG = 0x17;
+            NR14_REG = 0x83;
+            performantdelay(30);
+            NR10_REG = 0x00; //Si5
+            NR11_REG = 0x81;
+            NR12_REG = 0x4B;
+            NR13_REG = 0xE5;
+            NR14_REG = 0x83;
+            performantdelay(20);
+            NR10_REG = 0x00; //Dó6
+            NR11_REG = 0x81;
+            NR12_REG = 0x4B;
+            NR13_REG = 0x20;
+            NR14_REG = 0x84;
+            performantdelay(20);
+            NR10_REG = 0x00; //Sol5
+            NR11_REG = 0x81;
+            NR12_REG = 0x4B;
+            NR13_REG = 0x17;
+            NR14_REG = 0x83;
+            performantdelay(20);
+            NR10_REG = 0x00; //Muta
+            NR11_REG = 0x00;
+            NR12_REG = 0x00;
+            NR13_REG = 0x00;
+            NR14_REG = 0x80;
+            performantdelay(10);
+            NR10_REG = 0x00; //Sol5
+            NR11_REG = 0x81;
+            NR12_REG = 0x4B;
+            NR13_REG = 0x17;
+            NR14_REG = 0x83;
+            performantdelay(30);
+            NR10_REG = 0x00; //Fá5
+            NR11_REG = 0x81;
+            NR12_REG = 0x4B;
+            NR13_REG = 0xC1;
+            NR14_REG = 0x82;
+            performantdelay(20);
+            NR10_REG = 0x00; //Fá#5
+            NR11_REG = 0x81;
+            NR12_REG = 0x4B;
+            NR13_REG = 0xEA;
+            NR14_REG = 0x82;
+            performantdelay(20);
+        }
+
+        if(tocou == 0){
+            NR10_REG = 0x00;//Lá#6
+            NR11_REG = 0x81;
+            NR12_REG = 0x4B;
+            NR13_REG = 0x59;
+            NR14_REG = 0x87; 
+            performantdelay(10);
+            NR10_REG = 0x00;//Sol6
+            NR11_REG = 0x81;
+            NR12_REG = 0x4B;
+            NR13_REG = 0x2E;
+            NR14_REG = 0x86; 
+            performantdelay(10);
+            NR10_REG = 0x00;//Ré6
+            NR11_REG = 0x81;
+            NR12_REG = 0x4B;
+            NR13_REG = 0xA1;
+            NR14_REG = 0x84;
+            performantdelay(80);
+            NR10_REG = 0x00;//Lá#6
+            NR11_REG = 0x81;
+            NR12_REG = 0x4B;
+            NR13_REG = 0x59;
+            NR14_REG = 0x87; 
+            performantdelay(10);
+            NR10_REG = 0x00;//Sol6
+            NR11_REG = 0x81;
+            NR12_REG = 0x4B;
+            NR13_REG = 0x2E;
+            NR14_REG = 0x86; 
+            performantdelay(10);
+            NR10_REG = 0x00;//Dó#5
+            NR11_REG = 0x81;
+            NR12_REG = 0x4B;
+            NR13_REG = 0x2F;
+            NR14_REG = 0x82; 
+            performantdelay(80);
+            NR10_REG = 0x00;//Lá#6
+            NR11_REG = 0x81;
+            NR12_REG = 0x4B;
+            NR13_REG = 0x59;
+            NR14_REG = 0x87; 
+            performantdelay(10);
+            NR10_REG = 0x00;//Sol6
+            NR11_REG = 0x81;
+            NR12_REG = 0x4B;
+            NR13_REG = 0x2E;
+            NR14_REG = 0x86;  
+            performantdelay(10);
+            NR10_REG = 0x00;//Dó6
+            NR11_REG = 0x81;
+            NR12_REG = 0x4B;
+            NR13_REG = 0x20;
+            NR14_REG = 0x84;
+            performantdelay(80);
+            NR10_REG = 0x00;//Si5
+            NR11_REG = 0x81;
+            NR12_REG = 0x4B;
+            NR13_REG = 0xE5;
+            NR14_REG = 0x83;
+            performantdelay(10);
+            NR10_REG = 0x00;//Dó6
+            NR11_REG = 0x81;
+            NR12_REG = 0x4B;
+            NR13_REG = 0x20;
+            NR14_REG = 0x84;
+            performantdelay(10);
+            NR10_REG = 0x00; //Muta
+            NR11_REG = 0x00;
+            NR12_REG = 0x00;
+            NR13_REG = 0x00;
+            NR14_REG = 0x80;
+            performantdelay(40);
+            tocou = 1;
+        }
     }
 
     NR10_REG = 0x00; //Sol5
@@ -520,18 +789,11 @@ void playLobbySound()
     NR13_REG = 0x17;
     NR14_REG = 0x83;
     performantdelay(20);
-
     NR10_REG = 0x00; //Muta
     NR11_REG = 0x00;
     NR12_REG = 0x00;
     NR13_REG = 0x00;
     NR14_REG = 0x80;
-
-    /* NR10_REG = 0x00;
-    NR11_REG = 0x81;
-    NR12_REG = 0x43;
-    NR13_REG = 0x73;
-    NR14_REG = 0x86; */
 }
 
 void naveShotFire(GameBullet *bullet)
@@ -602,6 +864,7 @@ void bossShotFire()
                     }
                     moveGameBullet(&bulletBoss1, 180, 180);
                     moveGameNave(&nave, 180, 180);
+                    saveGame();
                 }
             }
         }
@@ -641,7 +904,7 @@ void bossShotFire()
                     moveGameBullet(&bulletBoss2[2], 180, 180);
 
                     moveGameNave(&nave, 180, 180);
-                    move_win(7, 180);
+                    saveGame();
                 }
             }
         }
@@ -761,7 +1024,7 @@ void nextFase()
         move_bkg(0,0);
         set_bkg_data(0, 45, keyboardData);
         set_bkg_tiles(0,0,20,18, tela_final);
-        playLobbySound();
+        playWinGameSound();
         waitpad(J_START);
         menu();
         break;
@@ -770,6 +1033,9 @@ void nextFase()
 
 void startFase1()
 {
+    if(faseName[2] != 33){
+        faseName[2] = 32; //Pega a sprite do número 1, que corresponde a fase atual
+    }
     isInGame = 1;
     currentBoss = 0; //Boss 0 na fase 1
     j = 0;
@@ -801,6 +1067,9 @@ void startFase1()
 
 void startFase2()
 {
+    if(faseName[2] == 32){
+        faseName[2] = 33; //Pega a sprite do número 1, que corresponde a fase atual
+    }
     isInGame = 1;
     currentBoss = 1; //Boss 1 na fase 2
     HIDE_BKG;
@@ -822,6 +1091,37 @@ void startFase2()
 void startFase3()
 {
     isInGame = 1;
+}
+
+void showScores(){
+    isInsHighscoreScreen = 1;
+    //set_bkg_data(0, 45, keyboardData);
+    move_bkg(0, 0);
+    set_bkg_tiles(0, 0, 20, 18, screenHighscoreBkg);
+
+    drawPlayerNameInHighScore();
+
+    SHOW_BKG;
+    HIDE_SPRITES;
+    DISPLAY_ON;
+
+    while(isInsHighscoreScreen){
+        switch (joypad()){
+        case J_A:
+            isInsHighscoreScreen = 0;
+            menu();
+            break;
+        }
+        performantdelay(2);
+    }
+}
+
+void screenHighscore(){
+    if(playerName[0] > 0x28){//0x28 em decimal é 40 e se o primeiro valos nesse vetor for maior que 40 significa que nele está armazenado lixo de memória e, portanto, nada foi salvo até o momento
+        //Por enquanto não faz nada, porque se não tem nada salvo, então não abre a tela de highscore
+    }else{
+        showScores();
+    }
 }
 
 
@@ -904,7 +1204,8 @@ void menu()
             }
             else
             {
-                //playLobbySound();
+                //playWinGameSound();
+                playLobbySound();
                 cursor.y -= 16;
             }
             move_sprite(0, cursor.x, cursor.y);
@@ -916,7 +1217,7 @@ void menu()
             }
             else
             {
-                //playLobbySound();
+                playLobbySound();
                 cursor.y += 16;
             }
             move_sprite(0, cursor.x, cursor.y);
@@ -929,7 +1230,7 @@ void menu()
             }
             else if (cursor.y == 112)
             { //Vai para a tela de Highscore
-               
+               screenHighscore();
             }
         }
         performantdelay(2);
