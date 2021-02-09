@@ -133,6 +133,13 @@ void resetCharacterName(){
 }
 
 void saveGame(){
+    if(faseName[2] == 32 && currentFase == 2 && faseName[2] != 0x0E){
+        faseName[2] = 33; //Pega a sprite do número 1, que corresponde a fase atual
+        resetCharacterName();
+        playerHasName = 0;
+        playerName[0] = 0x29;
+        nameCharacterIndex = 0;
+    }
     //Só entra no if se durante o jogo não houve nenhum save e se no arquivo não tem nenhum save salvo
     if(!playerHasName && playerName[0] > 0x28){
         resetCharacterName();
@@ -641,7 +648,6 @@ void playLobbySound()
 
 void playWinGameSound()
 {
-
     for(j = 0; j < 2; j++){
         for (i = 0; i < 2; i++){
             NR10_REG = 0x00; //Sol5
@@ -794,6 +800,7 @@ void playWinGameSound()
     NR12_REG = 0x00;
     NR13_REG = 0x00;
     NR14_REG = 0x80;
+    tocou = 0;
 }
 
 void naveShotFire(GameBullet *bullet)
@@ -1026,6 +1033,10 @@ void nextFase()
         set_bkg_tiles(0,0,20,18, tela_final);
         playWinGameSound();
         waitpad(J_START);
+        saveGame();
+        faseName[0] = 23;
+        faseName[1] = 9;
+        faseName[2] = 0x0E;
         menu();
         break;
     }
@@ -1033,7 +1044,7 @@ void nextFase()
 
 void startFase1()
 {
-    if(faseName[2] != 33){
+    if(faseName[2] != 33 && faseName[2] != 0x0E){
         faseName[2] = 32; //Pega a sprite do número 1, que corresponde a fase atual
     }
     isInGame = 1;
@@ -1067,13 +1078,6 @@ void startFase1()
 
 void startFase2()
 {
-    if(faseName[2] == 32){
-        faseName[2] = 33; //Pega a sprite do número 1, que corresponde a fase atual
-        resetCharacterName();
-        playerHasName = 0;
-        playerName[0] = 0x29;
-        nameCharacterIndex = 0;
-    }
     isInGame = 1;
     currentBoss = 1; //Boss 1 na fase 2
     HIDE_BKG;
