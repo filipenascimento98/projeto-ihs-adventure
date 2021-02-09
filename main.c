@@ -1069,6 +1069,10 @@ void startFase2()
 {
     if(faseName[2] == 32){
         faseName[2] = 33; //Pega a sprite do número 1, que corresponde a fase atual
+        resetCharacterName();
+        playerHasName = 0;
+        playerName[0] = 0x29;
+        nameCharacterIndex = 0;
     }
     isInGame = 1;
     currentBoss = 1; //Boss 1 na fase 2
