@@ -22,6 +22,10 @@ Para carregar a **ROM** é necessário ter um GameBoy ou um emulador. No nosso p
 |:-------------------------:|:-------------------------------:|
 | ![](images/highscore.png) | ![](images/tela_final.png) |
 
+# Link para a Demonstração
+
+- [Vídeo](https://youtu.be/t2I1-8q-pkE)
+
 # Referências
 - [Writing your first GameBoy game](https://medium.com/@ulrikdamm/writing-your-first-gameboy-game-4ea62c76db29)
 - [GBDK 2020](https://github.com/Zal0/gbdk-2020)
